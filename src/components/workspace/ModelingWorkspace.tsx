@@ -24,12 +24,8 @@ export function ModelingWorkspace() {
     setSelectedFace(nextSelectedFace);
     if (mode !== "mission") return;
 
-    const mission = missions[activeMissionIndex];
     setMissionResult(null);
-    setMissionSelections((current) => {
-      if (!mission.allowMultiple) return nextSelectedFace ? [nextSelectedFace] : [];
-      return current.includes(faceId) ? current.filter((item) => item !== faceId) : [...current, faceId];
-    });
+    setMissionSelections((current) => (current.includes(faceId) ? current.filter((item) => item !== faceId) : [...current, faceId]));
   };
 
   const resetSelection = () => {
