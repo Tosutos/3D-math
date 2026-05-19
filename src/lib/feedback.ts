@@ -43,6 +43,8 @@ export function getMissionFeedback(missionIndex: number, selectedFaces: FaceId[]
     return "먼저 정답이라고 생각하는 면을 선택해 보세요.";
   }
 
+  const wrongHeader = "오답입니다. ";
+
   const missing = mission.answer.filter((faceId) => !selectedFaces.includes(faceId));
   const extra = selectedFaces.filter((faceId) => !mission.answer.includes(faceId));
   const firstSelected = selectedFaces[0];
@@ -51,38 +53,38 @@ export function getMissionFeedback(missionIndex: number, selectedFaces: FaceId[]
   if (mission.id === "visible-faces") {
     const hiddenSelected = selectedFaces.filter((faceId) => !cubeFaces[faceId].visibleInDefaultView);
     if (hiddenSelected.length > 0) {
-      return `${hiddenSelected.map((faceId) => cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이지 않는 면이에요. 보이는 두 옆면과 윗면을 다시 찾아보세요.`;
+      return `${wrongHeader}${hiddenSelected.map((faceId) => cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이지 않는 면이에요. 보이는 두 옆면과 윗면을 다시 찾아보세요.`;
     }
   }
 
   if (mission.id === "hidden-faces" || mission.id === "hidden-edge-related") {
     const visibleSelected = selectedFaces.filter((faceId) => cubeFaces[faceId].visibleInDefaultView);
     if (visibleSelected.length > 0) {
-      return `${visibleSelected.map((faceId) => cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이는 면이에요. 보이지 않는 면을 찾아야 해요.`;
+      return `${wrongHeader}${visibleSelected.map((faceId) => cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이는 면이에요. 보이지 않는 면을 찾아야 해요.`;
     }
   }
 
   if (mission.id === "opposite-front" && firstSelected) {
     if (cubeFaces.front.adjacent.includes(firstSelected)) {
-      return "그 면은 기준 옆면과 만나는 면이에요. 평행한 면은 접었을 때 서로 만나지 않아요.";
+      return `${wrongHeader}그 면은 기준 옆면과 만나는 면이에요. 평행한 면은 접었을 때 서로 만나지 않아요.`;
     }
-    return getFaceFeedback(firstSelected, firstAnswer);
+    return `${wrongHeader}${getFaceFeedback(firstSelected, firstAnswer)}`;
   }
 
   if (mission.id === "top-adjacent") {
     const oppositeTop = selectedFaces.includes("bottom");
     if (oppositeTop) {
-      return "아랫면은 윗면과 마주 보는 면이에요. 윗면과 만나는 면은 네 개의 옆면입니다.";
+      return `${wrongHeader}아랫면은 윗면과 마주 보는 면이에요. 윗면과 만나는 면은 네 개의 옆면입니다.`;
     }
   }
 
   if (extra.length > 0) {
-    return `${extra.map((faceId) => cubeFaces[faceId].label).join(", ")}은 이번 문제의 정답에 포함되지 않아요. 면의 관계를 다시 확인해 보세요.`;
+    return `${wrongHeader}${extra.map((faceId) => cubeFaces[faceId].label).join(", ")}은 이번 문제의 정답에 포함되지 않아요. 면의 관계를 다시 확인해 보세요.`;
   }
 
   if (missing.length > 0) {
-    return `아직 ${missing.length}개의 면이 더 필요해요. 빠진 면이 어디에 있는지 전개도와 3D 도형에서 찾아보세요.`;
+    return `${wrongHeader}아직 ${missing.length}개의 면이 더 필요해요. 빠진 면이 어디에 있는지 전개도와 3D 도형에서 찾아보세요.`;
   }
 
-  return "선택한 면의 위치 관계를 다시 확인해 보세요.";
+  return `${wrongHeader}선택한 면의 위치 관계를 다시 확인해 보세요.`;
 }
