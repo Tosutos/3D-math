@@ -30,12 +30,14 @@ function CameraRig({ viewMode, unfoldProgress }: { viewMode: GeometryViewMode; u
   useEffect(() => {
     const foldedTarget: [number, number, number] = [0, -0.28, 0];
     const foldedPosition: [number, number, number] = [4.4, 2.8, 5.4];
+    const unfoldTarget: [number, number, number] = [0.35, -0.25, 0.9];
+    const unfoldPosition: [number, number, number] = [0.35, -0.2, 8.4];
     const netTarget: [number, number, number] = [0.6, -1.18, 0.2];
     const netPosition: [number, number, number] = [0.6, 5.9, 5.2];
-    const progress = viewMode === "net" ? 1 : viewMode === "unfold" ? unfoldProgress : 0;
-    const target: [number, number, number] = viewMode === "net" || viewMode === "unfold" ? mixVector(foldedTarget, netTarget, progress) : foldedTarget;
+    const progress = viewMode === "unfold" ? unfoldProgress : 0;
+    const target: [number, number, number] = viewMode === "net" ? netTarget : viewMode === "unfold" ? mixVector(foldedTarget, unfoldTarget, progress) : foldedTarget;
     const position: [number, number, number] =
-      viewMode === "net" || viewMode === "unfold" ? mixVector(foldedPosition, netPosition, progress) : viewMode === "isometric" ? [4.6, 3.4, 4.6] : foldedPosition;
+      viewMode === "net" ? netPosition : viewMode === "unfold" ? mixVector(foldedPosition, unfoldPosition, progress) : viewMode === "isometric" ? [4.6, 3.4, 4.6] : foldedPosition;
 
     camera.position.set(...position);
     camera.lookAt(...target);

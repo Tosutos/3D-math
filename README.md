@@ -101,7 +101,7 @@ src/
 
 - `solid`: 일반 3D 입체 보기
 - `isometric`: 겨냥도에 가까운 카메라 시점
-- `unfold`: 전개 손잡이 바를 드래그해 입체가 전개도로 점점 펴지는 과정 보기
+- `unfold`: 전개 손잡이 바를 드래그해 front 면을 기준으로 나머지 면이 모서리 축을 따라 종이처럼 펴지는 과정 보기
 - `net`: 완성된 전개도처럼 면을 펼친 보기
 
 ### 조작 기능
@@ -143,7 +143,7 @@ type FaceId = "front" | "back" | "left" | "right" | "top" | "bottom";
 
 type LearningMode = "explore" | "mission";
 
-type GeometryViewMode = "solid" | "isometric" | "net";
+type GeometryViewMode = "solid" | "isometric" | "unfold" | "net";
 ```
 
 면 관계 데이터는 `src/data/cube.ts`에 있습니다.
@@ -175,7 +175,7 @@ type GeometryViewMode = "solid" | "isometric" | "net";
 ### 바로 정리할 수 있는 것
 
 - 펼치기 진행도 바를 실제 3D 모서리 핸들 드래그로 교체
-- 펼침 보간을 단순 위치/회전 보간에서 실제 힌지 축 회전 방식으로 정교화
+- 여러 모서리 중 어느 선을 자를지 선택해 서로 다른 전개도 만들기
 - UI 문구를 초등학생 눈높이에 맞게 더 부드럽게 다듬기
 - Inspector가 작은 화면에서도 보이도록 모바일 패널 설계
 - 미션 선택 상태가 더 명확하게 보이도록 버튼/면 표시 개선

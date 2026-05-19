@@ -78,7 +78,7 @@ export function FloatingToolbar({
             <span>입체</span>
             <span>전개도</span>
           </div>
-          <p className="mt-2 text-[11px] leading-4 text-cyan-100/80">1차 구현은 손잡이 바 방식입니다. 다음 단계에서 실제 모서리 핸들 드래그로 바꿀 수 있어요.</p>
+          <p className="mt-2 text-[11px] leading-4 text-cyan-100/80">front 면을 기준으로 모서리를 축 삼아 종이 주사위처럼 접힌 면들이 펴집니다.</p>
         </div>
       )}
 
