@@ -11,23 +11,37 @@ type SolidCanvasProps = {
   selectedFace: FaceId | null;
   viewMode: GeometryViewMode;
   transparentMode: boolean;
+  unfoldProgress: number;
   onSelectFace: (face: FaceId) => void;
 };
 
-function CameraRig({ viewMode }: { viewMode: GeometryViewMode }) {
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+function mixVector(a: [number, number, number], b: [number, number, number], t: number): [number, number, number] {
+  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+}
+
+function CameraRig({ viewMode, unfoldProgress }: { viewMode: GeometryViewMode; unfoldProgress: number }) {
   const { camera } = useThree();
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
   useEffect(() => {
-    const target: [number, number, number] = viewMode === "net" ? [0.6, -1.18, 0.2] : [0, -0.28, 0];
+    const foldedTarget: [number, number, number] = [0, -0.28, 0];
+    const foldedPosition: [number, number, number] = [4.4, 2.8, 5.4];
+    const netTarget: [number, number, number] = [0.6, -1.18, 0.2];
+    const netPosition: [number, number, number] = [0.6, 5.9, 5.2];
+    const progress = viewMode === "net" ? 1 : viewMode === "unfold" ? unfoldProgress : 0;
+    const target: [number, number, number] = viewMode === "net" || viewMode === "unfold" ? mixVector(foldedTarget, netTarget, progress) : foldedTarget;
     const position: [number, number, number] =
-      viewMode === "net" ? [0.6, 5.9, 5.2] : viewMode === "isometric" ? [4.6, 3.4, 4.6] : [4.4, 2.8, 5.4];
+      viewMode === "net" || viewMode === "unfold" ? mixVector(foldedPosition, netPosition, progress) : viewMode === "isometric" ? [4.6, 3.4, 4.6] : foldedPosition;
 
     camera.position.set(...position);
     camera.lookAt(...target);
     controlsRef.current?.target.set(...target);
     controlsRef.current?.update();
-  }, [camera, viewMode]);
+  }, [camera, viewMode, unfoldProgress]);
 
   return <OrbitControls ref={controlsRef} enablePan enableZoom minDistance={3.2} maxDistance={10} makeDefault />;
 }
@@ -56,7 +70,7 @@ function Floor() {
   );
 }
 
-export function SolidCanvas({ selectedFace, viewMode, transparentMode, onSelectFace }: SolidCanvasProps) {
+export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldProgress, onSelectFace }: SolidCanvasProps) {
   return (
     <Canvas shadows camera={{ position: [4.4, 3.4, 5.4], fov: 38 }}>
       <color attach="background" args={["#eaf8ff"]} />
@@ -65,10 +79,10 @@ export function SolidCanvas({ selectedFace, viewMode, transparentMode, onSelectF
       <directionalLight position={[4, 8, 4]} intensity={2.8} castShadow />
       <pointLight position={[-4, 2, -4]} intensity={1.1} color="#7dd3fc" />
       <pointLight position={[4, -1, 3]} intensity={0.65} color="#bae6fd" />
-      <CubeModel selectedFace={selectedFace} onSelectFace={onSelectFace} viewMode={viewMode} transparentMode={transparentMode} />
+      <CubeModel selectedFace={selectedFace} onSelectFace={onSelectFace} viewMode={viewMode} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
       <Floor />
       <ContactShadows position={[0, -1.23, 0]} opacity={0.42} scale={9} blur={2.8} />
-      <CameraRig viewMode={viewMode} />
+      <CameraRig viewMode={viewMode} unfoldProgress={unfoldProgress} />
     </Canvas>
   );
 }

@@ -4,8 +4,10 @@ type FloatingToolbarProps = {
   mode: LearningMode;
   viewMode: GeometryViewMode;
   transparentMode: boolean;
+  unfoldProgress: number;
   onChangeMode: (mode: LearningMode) => void;
   onChangeViewMode: (viewMode: GeometryViewMode) => void;
+  onChangeUnfoldProgress: (progress: number) => void;
   onToggleTransparent: () => void;
   onReset: () => void;
 };
@@ -16,8 +18,10 @@ export function FloatingToolbar({
   mode,
   viewMode,
   transparentMode,
+  unfoldProgress,
   onChangeMode,
   onChangeViewMode,
+  onChangeUnfoldProgress,
   onToggleTransparent,
   onReset,
 }: FloatingToolbarProps) {
@@ -35,10 +39,11 @@ export function FloatingToolbar({
 
       <div className="mt-3 rounded-2xl bg-white/8 p-3">
         <p className="mb-2 text-xs font-bold text-slate-300">보기 방식</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {[
             ["solid", "입체"],
-            ["isometric", "겨냥도"],
+            ["isometric", "겨냥"],
+            ["unfold", "펼치기"],
             ["net", "전개"],
           ].map(([value, label]) => (
             <button
@@ -51,8 +56,31 @@ export function FloatingToolbar({
             </button>
           ))}
         </div>
-        <p className="mt-2 text-[11px] leading-4 text-slate-400">겨냥도와 전개도는 별도 창이 아니라 3D 공간 안에서 전환됩니다.</p>
+        <p className="mt-2 text-[11px] leading-4 text-slate-400">펼치기에서는 바를 끌어 입체가 전개도로 변하는 과정을 관찰합니다.</p>
       </div>
+
+      {viewMode === "unfold" && (
+        <div className="mt-3 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 p-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-xs font-bold text-cyan-100">전개 손잡이</p>
+            <span className="rounded-full bg-cyan-200 px-2 py-0.5 text-[10px] font-black text-slate-950">{Math.round(unfoldProgress * 100)}%</span>
+          </div>
+          <input
+            aria-label="정육면체 전개 진행도"
+            type="range"
+            min="0"
+            max="100"
+            value={Math.round(unfoldProgress * 100)}
+            onChange={(event) => onChangeUnfoldProgress(Number(event.target.value) / 100)}
+            className="h-2 w-full accent-cyan-300"
+          />
+          <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400">
+            <span>입체</span>
+            <span>전개도</span>
+          </div>
+          <p className="mt-2 text-[11px] leading-4 text-cyan-100/80">1차 구현은 손잡이 바 방식입니다. 다음 단계에서 실제 모서리 핸들 드래그로 바꿀 수 있어요.</p>
+        </div>
+      )}
 
       <div className="mt-3 rounded-2xl bg-white/8 p-3">
         <p className="mb-2 text-xs font-bold text-slate-300">모드</p>

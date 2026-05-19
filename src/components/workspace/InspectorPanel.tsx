@@ -1,9 +1,9 @@
 import { cubeFaces, faceColors, oppositeFaceColor } from "@/data/cube";
-import type { FaceId } from "@/types/geometry";
+import type { FaceId, GeometryViewMode } from "@/types/geometry";
 
 type InspectorPanelProps = {
   selectedFace: FaceId | null;
-  viewMode?: "solid" | "isometric" | "net";
+  viewMode?: GeometryViewMode;
 };
 
 export function InspectorPanel({ selectedFace, viewMode = "solid" }: InspectorPanelProps) {

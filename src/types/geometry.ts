@@ -2,7 +2,7 @@ export type FaceId = "front" | "back" | "left" | "right" | "top" | "bottom";
 
 export type LearningMode = "explore" | "mission";
 
-export type GeometryViewMode = "solid" | "isometric" | "net";
+export type GeometryViewMode = "solid" | "isometric" | "unfold" | "net";
 
 export type FaceRelation = {
   id: FaceId;
