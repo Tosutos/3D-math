@@ -7,6 +7,7 @@ export type GeometryViewMode = "solid" | "isometric" | "unfold" | "net";
 export type FaceRelation = {
   id: FaceId;
   label: string;
+  displayName?: string;
   opposite: FaceId;
   adjacent: FaceId[];
   visibleInDefaultView: boolean;

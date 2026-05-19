@@ -15,17 +15,12 @@ type CubeFaceProps = {
   position: [number, number, number];
   rotation: [number, number, number];
   selectedFace: FaceId | null;
+  selectedFaces?: FaceId[];
   transparentMode: boolean;
   onSelectFace: (face: FaceId) => void;
-};
-
-const faceLabels: Record<FaceId, string> = {
-  front: "가",
-  right: "나",
-  back: "다",
-  left: "라",
-  top: "마",
-  bottom: "바",
+  showLabel?: boolean;
+  showEdges?: boolean;
+  isMissionMode?: boolean;
 };
 
 function createLabelTexture(label: string) {
@@ -56,14 +51,15 @@ function createLabelTexture(label: string) {
   return texture;
 }
 
-export function CubeFace({ faceId, position, rotation, selectedFace, transparentMode, onSelectFace }: CubeFaceProps) {
-  const isSelected = selectedFace === faceId;
-  const selectedRelation = selectedFace ? cubeFaces[selectedFace] : null;
+export function CubeFace({ faceId, position, rotation, selectedFace, selectedFaces, transparentMode, onSelectFace, showLabel = true, showEdges, isMissionMode = false }: CubeFaceProps) {
+  const isSelected = isMissionMode ? (selectedFaces ?? []).includes(faceId) : selectedFace === faceId;
+  const selectedRelation = selectedFace && !isMissionMode ? cubeFaces[selectedFace] : null;
   const isOpposite = selectedRelation?.opposite === faceId;
   const isAdjacent = selectedRelation?.adjacent.includes(faceId) ?? false;
-  const faceColor = isOpposite ? oppositeFaceColor : isSelected ? selectedFaceColor : isAdjacent ? adjacentFaceColor : baseFaceColor;
-  const edgeColor = "#111827";
-  const labelTexture = useMemo(() => createLabelTexture(faceLabels[faceId]), [faceId]);
+  const faceColor = isSelected && isMissionMode ? "#ff3b30" : isOpposite ? oppositeFaceColor : isSelected ? selectedFaceColor : isAdjacent ? adjacentFaceColor : baseFaceColor;
+  const edgeColor = "#000000";
+  const labelText = cubeFaces[faceId].displayName ?? cubeFaces[faceId].label;
+  const labelTexture = useMemo(() => createLabelTexture(labelText), [labelText]);
 
   return (
     <group position={position} rotation={rotation}>
@@ -87,29 +83,33 @@ export function CubeFace({ faceId, position, rotation, selectedFace, transparent
           opacity={transparentMode ? (isSelected || isOpposite ? 0.72 : 0.34) : isSelected || isOpposite ? 1 : 0.82}
           depthWrite={!transparentMode}
         />
-        {!transparentMode && <Edges color={edgeColor} linewidth={2} />}
+        {(showEdges ?? !transparentMode) && <Edges color={edgeColor} linewidth={2} />}
       </mesh>
-      <mesh
-        position={[0, 0, 0.032]}
-        onClick={(event) => {
-          event.stopPropagation();
-          onSelectFace(faceId);
-        }}
-      >
-        <planeGeometry args={[0.68, 0.68]} />
-        <meshBasicMaterial map={labelTexture} transparent opacity={transparentMode ? 0.72 : 0.95} depthWrite={false} side={DoubleSide} />
-      </mesh>
-      <mesh
-        position={[0, 0, -0.032]}
-        rotation={[0, Math.PI, 0]}
-        onClick={(event) => {
-          event.stopPropagation();
-          onSelectFace(faceId);
-        }}
-      >
-        <planeGeometry args={[0.68, 0.68]} />
-        <meshBasicMaterial map={labelTexture} transparent opacity={transparentMode ? 0.72 : 0.95} depthWrite={false} side={DoubleSide} />
-      </mesh>
+      {showLabel !== false && (
+        <>
+          <mesh
+            position={[0, 0, 0.032]}
+            onClick={(event) => {
+              event.stopPropagation();
+              onSelectFace(faceId);
+            }}
+          >
+            <planeGeometry args={[0.68, 0.68]} />
+            <meshBasicMaterial map={labelTexture} transparent opacity={transparentMode ? 0.72 : 0.95} depthWrite={false} side={DoubleSide} />
+          </mesh>
+          <mesh
+            position={[0, 0, -0.032]}
+            rotation={[0, Math.PI, 0]}
+            onClick={(event) => {
+              event.stopPropagation();
+              onSelectFace(faceId);
+            }}
+          >
+            <planeGeometry args={[0.68, 0.68]} />
+            <meshBasicMaterial map={labelTexture} transparent opacity={transparentMode ? 0.72 : 0.95} depthWrite={false} side={DoubleSide} />
+          </mesh>
+        </>
+      )}
     </group>
   );
 }

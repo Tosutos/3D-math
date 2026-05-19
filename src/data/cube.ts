@@ -18,6 +18,7 @@ export const cubeFaces: Record<FaceId, FaceRelation> = {
   front: {
     id: "front",
     label: "옆면",
+    displayName: "가",
     opposite: "back",
     adjacent: ["top", "bottom", "left", "right"],
     visibleInDefaultView: true,
@@ -25,6 +26,7 @@ export const cubeFaces: Record<FaceId, FaceRelation> = {
   back: {
     id: "back",
     label: "옆면",
+    displayName: "나",
     opposite: "front",
     adjacent: ["top", "bottom", "left", "right"],
     visibleInDefaultView: false,
@@ -32,6 +34,7 @@ export const cubeFaces: Record<FaceId, FaceRelation> = {
   left: {
     id: "left",
     label: "옆면",
+    displayName: "다",
     opposite: "right",
     adjacent: ["top", "bottom", "front", "back"],
     visibleInDefaultView: false,
@@ -39,6 +42,7 @@ export const cubeFaces: Record<FaceId, FaceRelation> = {
   right: {
     id: "right",
     label: "옆면",
+    displayName: "라",
     opposite: "left",
     adjacent: ["top", "bottom", "front", "back"],
     visibleInDefaultView: true,
@@ -46,6 +50,7 @@ export const cubeFaces: Record<FaceId, FaceRelation> = {
   top: {
     id: "top",
     label: "윗면",
+    displayName: "마",
     opposite: "bottom",
     adjacent: ["front", "back", "left", "right"],
     visibleInDefaultView: true,
@@ -53,6 +58,7 @@ export const cubeFaces: Record<FaceId, FaceRelation> = {
   bottom: {
     id: "bottom",
     label: "아랫면",
+    displayName: "바",
     opposite: "top",
     adjacent: ["front", "back", "left", "right"],
     visibleInDefaultView: false,

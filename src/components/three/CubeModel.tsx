@@ -1,13 +1,17 @@
 import { CubeFace } from "@/components/three/CubeFace";
 import { DynamicCubeEdges } from "@/components/three/DynamicCubeEdges";
-import type { FaceId, GeometryViewMode } from "@/types/geometry";
+import type { FaceId, GeometryViewMode, LearningMode } from "@/types/geometry";
 
 type CubeModelProps = {
   selectedFace: FaceId | null;
+  selectedFaces?: FaceId[];
   onSelectFace: (face: FaceId) => void;
   viewMode: GeometryViewMode;
   transparentMode: boolean;
   unfoldProgress: number;
+  showFaceLabels: boolean;
+  showFaceEdges?: boolean;
+  mode: LearningMode;
 };
 
 type FaceTransform = {
@@ -43,62 +47,66 @@ function smoothstep(value: number) {
   return t * t * (3 - 2 * t);
 }
 
-function Face({ faceId, selectedFace, transparentMode, onSelectFace }: Omit<CubeModelProps, "viewMode" | "unfoldProgress"> & { faceId: FaceId }) {
+function Face({ faceId, selectedFace, selectedFaces, transparentMode, onSelectFace, showFaceLabels, showFaceEdges, mode }: Omit<CubeModelProps, "viewMode" | "unfoldProgress"> & { faceId: FaceId }) {
   return (
     <CubeFace
       faceId={faceId}
       position={[0, 0, 0]}
       rotation={[0, 0, 0]}
       selectedFace={selectedFace}
+      selectedFaces={selectedFaces}
       transparentMode={transparentMode}
       onSelectFace={onSelectFace}
+      showLabel={showFaceLabels}
+      showEdges={showFaceEdges}
+      isMissionMode={mode === "mission"}
     />
   );
 }
 
-function FloorUnfoldCube({ selectedFace, transparentMode, onSelectFace, unfoldProgress }: Omit<CubeModelProps, "viewMode">) {
+function FloorUnfoldCube({ selectedFace, selectedFaces, transparentMode, onSelectFace, unfoldProgress, showFaceLabels, showFaceEdges, mode }: Omit<CubeModelProps, "viewMode">) {
   const t = smoothstep(unfoldProgress);
   const sideAngle = (Math.PI / 2) * t;
 
   return (
     <group>
       <group position={[0, -1, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <Face faceId="bottom" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+        <Face faceId="bottom" selectedFace={selectedFace} selectedFaces={selectedFaces} transparentMode={transparentMode} onSelectFace={onSelectFace} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
       </group>
 
       <group position={[0, -1, 1]} rotation={[sideAngle, 0, 0]}>
         <group position={[0, 1, 0]}>
-          <Face faceId="front" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+          <Face faceId="front" selectedFace={selectedFace} selectedFaces={selectedFaces} transparentMode={transparentMode} onSelectFace={onSelectFace} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
         </group>
         <group position={[0, 2, 0]} rotation={[sideAngle, 0, 0]}>
           <group position={[0, 0, -1]} rotation={[-Math.PI / 2, 0, 0]}>
-            <Face faceId="top" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+            <Face faceId="top" selectedFace={selectedFace} selectedFaces={selectedFaces} transparentMode={transparentMode} onSelectFace={onSelectFace} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
           </group>
         </group>
       </group>
 
       <group position={[0, -1, -1]} rotation={[-sideAngle, 0, 0]}>
         <group position={[0, 1, 0]} rotation={[0, Math.PI, 0]}>
-          <Face faceId="back" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+          <Face faceId="back" selectedFace={selectedFace} selectedFaces={selectedFaces} transparentMode={transparentMode} onSelectFace={onSelectFace} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
         </group>
       </group>
 
       <group position={[1, -1, 0]} rotation={[0, 0, -sideAngle]}>
         <group position={[0, 1, 0]} rotation={[0, Math.PI / 2, 0]}>
-          <Face faceId="right" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+          <Face faceId="right" selectedFace={selectedFace} selectedFaces={selectedFaces} transparentMode={transparentMode} onSelectFace={onSelectFace} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
         </group>
       </group>
 
       <group position={[-1, -1, 0]} rotation={[0, 0, sideAngle]}>
         <group position={[0, 1, 0]} rotation={[0, -Math.PI / 2, 0]}>
-          <Face faceId="left" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+          <Face faceId="left" selectedFace={selectedFace} selectedFaces={selectedFaces} transparentMode={transparentMode} onSelectFace={onSelectFace} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
         </group>
       </group>
     </group>
   );
 }
 
-export function CubeModel({ selectedFace, onSelectFace, viewMode, transparentMode, unfoldProgress }: CubeModelProps) {
+export function CubeModel({ selectedFace, selectedFaces, onSelectFace, viewMode, transparentMode, unfoldProgress, showFaceLabels, showFaceEdges, mode }: CubeModelProps) {
   const isNet = viewMode === "net";
   const isUnfold = viewMode === "unfold";
   const transforms = isNet ? netFaceTransforms : foldedFaceTransforms;
@@ -108,7 +116,7 @@ export function CubeModel({ selectedFace, onSelectFace, viewMode, transparentMod
   return (
     <group position={position} scale={scale}>
       {isUnfold ? (
-        <FloorUnfoldCube selectedFace={selectedFace} onSelectFace={onSelectFace} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
+        <FloorUnfoldCube selectedFace={selectedFace} selectedFaces={selectedFaces} onSelectFace={onSelectFace} transparentMode={transparentMode} unfoldProgress={unfoldProgress} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
       ) : (
         <>
           {!isNet && <DynamicCubeEdges visible={transparentMode} />}
@@ -119,8 +127,12 @@ export function CubeModel({ selectedFace, onSelectFace, viewMode, transparentMod
               position={face.position}
               rotation={face.rotation}
               selectedFace={selectedFace}
+              selectedFaces={selectedFaces}
               transparentMode={transparentMode}
               onSelectFace={onSelectFace}
+              showLabel={showFaceLabels}
+              showEdges={showFaceEdges}
+              isMissionMode={mode === "mission"}
             />
           ))}
         </>

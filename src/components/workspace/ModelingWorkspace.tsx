@@ -13,6 +13,7 @@ export function ModelingWorkspace() {
   const [mode, setMode] = useState<LearningMode>("explore");
   const [viewMode, setViewMode] = useState<GeometryViewMode>("solid");
   const [transparentMode, setTransparentMode] = useState(false);
+  const [showFaceLabels, setShowFaceLabels] = useState(true);
   const [unfoldProgress, setUnfoldProgress] = useState(0);
   const [activeMissionIndex, setActiveMissionIndex] = useState(0);
   const [missionSelections, setMissionSelections] = useState<FaceId[]>([]);
@@ -59,9 +60,12 @@ export function ModelingWorkspace() {
       <div className="absolute inset-0">
         <SolidCanvas
           selectedFace={selectedFace}
+          selectedFaces={missionSelections}
           viewMode={viewMode}
           transparentMode={transparentMode}
           unfoldProgress={unfoldProgress}
+          showFaceLabels={showFaceLabels}
+          mode={mode}
           onSelectFace={handleSelectFace}
           onChangeUnfoldProgress={setUnfoldProgress}
         />
@@ -78,7 +82,7 @@ export function ModelingWorkspace() {
         onToggleTransparent={() => setTransparentMode((value) => !value)}
         onReset={resetSelection}
       />
-      <InspectorPanel selectedFace={selectedFace} viewMode={viewMode} />
+      <InspectorPanel selectedFace={selectedFace} viewMode={viewMode} showFaceLabels={showFaceLabels} onToggleShowFaceLabels={() => setShowFaceLabels((v) => !v)} />
       {mode === "mission" && (
         <MissionBar
           activeMissionIndex={activeMissionIndex}

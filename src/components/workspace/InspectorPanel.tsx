@@ -4,10 +4,14 @@ import type { FaceId, GeometryViewMode } from "@/types/geometry";
 type InspectorPanelProps = {
   selectedFace: FaceId | null;
   viewMode?: GeometryViewMode;
+  showFaceLabels?: boolean;
+  onToggleShowFaceLabels?: () => void;
 };
 
-export function InspectorPanel({ selectedFace, viewMode = "solid" }: InspectorPanelProps) {
+export function InspectorPanel({ selectedFace, viewMode = "solid", showFaceLabels = true, onToggleShowFaceLabels }: InspectorPanelProps) {
   const selected = selectedFace ? cubeFaces[selectedFace] : null;
+  const showLabels = showFaceLabels;
+  const onToggle = onToggleShowFaceLabels;
 
   return (
     <aside className="absolute right-4 top-4 z-20 hidden w-[300px] rounded-3xl border border-white/15 bg-white/88 p-4 text-slate-950 shadow-2xl shadow-black/30 backdrop-blur-xl lg:block">
@@ -16,17 +20,23 @@ export function InspectorPanel({ selectedFace, viewMode = "solid" }: InspectorPa
 
       {selected ? (
         <div className="mt-4 space-y-4">
-          <div className="rounded-2xl p-4 ring-2 ring-slate-900" style={{ backgroundColor: faceColors[selected.id] }}>
-            <p className="text-xs font-bold text-slate-700">선택한 면</p>
-            <p className="mt-1 text-2xl font-black">{selected.label}</p>
-            <p className="mt-1 text-xs font-bold text-slate-700">
-              기본 겨냥도에서 {selected.visibleInDefaultView ? "보이는 면" : "숨은 면"}
-            </p>
+          <div className="rounded-2xl p-4 ring-2 ring-slate-900 flex items-center justify-between" style={{ backgroundColor: faceColors[selected.id] }}>
+            <div>
+              <p className="text-xs font-bold text-slate-700">선택한 면</p>
+              <p className="mt-1 text-2xl font-black">{selected.displayName ?? selected.label}</p>
+              <p className="mt-1 text-xs font-bold text-slate-700">
+                기본 겨냥도에서 {selected.visibleInDefaultView ? "보이는 면" : "숨은 면"}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-bold text-slate-700">면 이름</p>
+              <p className="text-lg font-extrabold">{selected.displayName ?? "-"}</p>
+            </div>
           </div>
 
           <div className="rounded-2xl bg-emerald-50 p-4 ring-1 ring-emerald-200">
             <p className="text-xs font-black text-emerald-800">평행한 면</p>
-            <p className="mt-1 font-black">{cubeFaces[selected.opposite].label}</p>
+            <p className="mt-1 font-black">{cubeFaces[selected.opposite].displayName ?? cubeFaces[selected.opposite].label}</p>
             <p className="mt-2 text-xs font-bold text-emerald-700">
               3D 도형에서는 이 면이 초록색으로 표시됩니다.
             </p>
@@ -36,7 +46,7 @@ export function InspectorPanel({ selectedFace, viewMode = "solid" }: InspectorPa
           <div className="rounded-2xl bg-slate-50 p-4">
             <p className="text-xs font-black text-emerald-800">만나는 면</p>
             <p className="mt-1 text-sm font-bold leading-6">
-              {selected.adjacent.map((faceId) => cubeFaces[faceId].label).join(" · ")}
+              {selected.adjacent.map((faceId) => cubeFaces[faceId].displayName ?? cubeFaces[faceId].label).join(" · ")}
             </p>
           </div>
         </div>
@@ -56,6 +66,13 @@ export function InspectorPanel({ selectedFace, viewMode = "solid" }: InspectorPa
         <div className="rounded-2xl bg-sky-50 p-3"><p className="text-xs font-bold text-sky-700">면</p><p className="font-black">6</p></div>
         <div className="rounded-2xl bg-sky-50 p-3"><p className="text-xs font-bold text-sky-700">모서리</p><p className="font-black">12</p></div>
         <div className="rounded-2xl bg-sky-50 p-3"><p className="text-xs font-bold text-sky-700">꼭짓점</p><p className="font-black">8</p></div>
+      </div>
+
+      <div className="mt-4 rounded-2xl bg-white p-3 border">
+        <label className="flex items-center gap-3">
+          <input type="checkbox" checked={showLabels} onChange={() => onToggle && onToggle()} />
+          <span className="text-sm font-bold text-slate-700">면 라벨 표시 (가·나·다·...)</span>
+        </label>
       </div>
     </aside>
   );

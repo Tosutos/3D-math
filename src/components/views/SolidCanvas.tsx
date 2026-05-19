@@ -6,13 +6,16 @@ import { ContactShadows, Grid, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { CubeModel } from "@/components/three/CubeModel";
 import { UnfoldHandle } from "@/components/three/UnfoldHandle";
-import type { FaceId, GeometryViewMode } from "@/types/geometry";
+import type { FaceId, GeometryViewMode, LearningMode } from "@/types/geometry";
 
 type SolidCanvasProps = {
   selectedFace: FaceId | null;
+  selectedFaces?: FaceId[];
   viewMode: GeometryViewMode;
   transparentMode: boolean;
   unfoldProgress: number;
+  showFaceLabels: boolean;
+  mode: LearningMode;
   onSelectFace: (face: FaceId) => void;
   onChangeUnfoldProgress: (progress: number) => void;
 };
@@ -74,7 +77,7 @@ function Floor() {
   );
 }
 
-export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldProgress, onSelectFace, onChangeUnfoldProgress }: SolidCanvasProps) {
+export function SolidCanvas({ selectedFace, selectedFaces, viewMode, transparentMode, unfoldProgress, showFaceLabels, mode, onSelectFace, onChangeUnfoldProgress }: SolidCanvasProps) {
   const [handleDragging, setHandleDragging] = useState(false);
   const [handleCancelToken, setHandleCancelToken] = useState(0);
 
@@ -93,7 +96,17 @@ export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldPro
       <directionalLight position={[4, 8, 4]} intensity={2.8} castShadow />
       <pointLight position={[-4, 2, -4]} intensity={1.1} color="#7dd3fc" />
       <pointLight position={[4, -1, 3]} intensity={0.65} color="#bae6fd" />
-      <CubeModel selectedFace={selectedFace} onSelectFace={onSelectFace} viewMode={viewMode} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
+      <CubeModel
+        selectedFace={selectedFace}
+        selectedFaces={selectedFaces}
+        onSelectFace={onSelectFace}
+        viewMode={viewMode}
+        transparentMode={transparentMode}
+        unfoldProgress={unfoldProgress}
+        showFaceLabels={showFaceLabels}
+        showFaceEdges={viewMode === "net" || viewMode === "unfold"}
+        mode={mode}
+      />
       {viewMode === "unfold" && (
         <UnfoldHandle
           key={handleCancelToken}
