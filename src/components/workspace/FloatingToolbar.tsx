@@ -24,7 +24,7 @@ export function FloatingToolbar({
   return (
     <aside className="absolute left-3 top-3 z-20 max-h-[calc(100vh-1.5rem)] w-[min(260px,calc(100vw-1.5rem))] overflow-y-auto rounded-3xl border border-white/15 bg-slate-950/78 p-4 text-white shadow-2xl shadow-black/40 backdrop-blur-xl md:left-4 md:top-4">
       <p className="text-[10px] font-black tracking-[0.24em] text-cyan-300">3D MATH TOOL</p>
-      <h1 className="mt-1 text-xl font-black tracking-[-0.04em]">3D 도형 변환 실험실</h1>
+      <h1 className="mt-1 text-xl font-black tracking-[-0.04em]">똑똑 입체 탐험대</h1>
 
       <div className="mt-4 rounded-2xl bg-white/8 p-3">
         <p className="mb-2 text-xs font-bold text-slate-300">도형</p>

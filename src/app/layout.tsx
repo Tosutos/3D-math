@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "3D 도형 변환 실험실",
+  title: "똑똑 입체 탐험대",
   description: "겨냥도, 입체도형, 전개도를 연결해 정육면체의 구조를 탐구하는 초등 수학 학습 도구",
 };
 
