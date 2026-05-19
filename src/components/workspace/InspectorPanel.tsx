@@ -30,7 +30,7 @@ export function InspectorPanel({ selectedFace, viewMode = "solid", showFaceLabel
             </div>
             <div className="text-right">
               <p className="text-xs font-bold text-slate-700">면 이름</p>
-              <p className="text-lg font-extrabold">{selected.displayName ?? "-"}</p>
+              <p className="text-lg font-extrabold">{selected.displayName ?? selected.label}</p>
             </div>
           </div>
 

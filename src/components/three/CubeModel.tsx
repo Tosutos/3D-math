@@ -115,8 +115,8 @@ export function CubeModel({ selectedFace, selectedFaces, onSelectFace, viewMode,
 
   return (
     <group position={position} scale={scale}>
-      {isUnfold ? (
-        <FloorUnfoldCube selectedFace={selectedFace} selectedFaces={selectedFaces} onSelectFace={onSelectFace} transparentMode={transparentMode} unfoldProgress={unfoldProgress} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
+      {(isUnfold || isNet) ? (
+        <FloorUnfoldCube selectedFace={selectedFace} selectedFaces={selectedFaces} onSelectFace={onSelectFace} transparentMode={transparentMode} unfoldProgress={isNet ? 1 : unfoldProgress} showFaceLabels={showFaceLabels} showFaceEdges={showFaceEdges} mode={mode} />
       ) : (
         <>
           {!isNet && <DynamicCubeEdges visible={transparentMode} />}

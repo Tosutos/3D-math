@@ -23,7 +23,7 @@ export function MissionBar({ activeMissionIndex, selectedFaces, result, onChange
           <h2 className="text-lg font-black">{mission.title}</h2>
           <p className="mt-1 text-sm font-bold text-slate-700">{mission.prompt}</p>
           <p className="mt-1 text-xs text-slate-500">
-            선택: {selectedFaces.length ? selectedFaces.map((faceId) => cubeFaces[faceId].label).join(" · ") : "없음"}
+            선택: {selectedFaces.length ? selectedFaces.map((faceId) => cubeFaces[faceId].displayName ?? cubeFaces[faceId].label).join(" · ") : "없음"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2 md:justify-end">

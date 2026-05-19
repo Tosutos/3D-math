@@ -37,8 +37,8 @@ function CameraRig({ viewMode, unfoldProgress, controlsEnabled }: { viewMode: Ge
     const foldedPosition: [number, number, number] = [4.4, 2.8, 5.4];
     const unfoldTarget: [number, number, number] = [0, -0.85, 0.95];
     const unfoldPosition: [number, number, number] = [0, 3.8, 7.4];
-    const netTarget: [number, number, number] = [0.6, -1.18, 0.2];
-    const netPosition: [number, number, number] = [0.6, 5.9, 5.2];
+    const netTarget: [number, number, number] = [1, -1.23, 0];
+    const netPosition: [number, number, number] = [1, 6.3, 7.2];
     const progress = viewMode === "unfold" ? unfoldProgress : 0;
     const target: [number, number, number] = viewMode === "net" ? netTarget : viewMode === "unfold" ? mixVector(foldedTarget, unfoldTarget, progress) : foldedTarget;
     const position: [number, number, number] =

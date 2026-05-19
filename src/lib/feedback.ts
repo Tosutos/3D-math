@@ -53,14 +53,14 @@ export function getMissionFeedback(missionIndex: number, selectedFaces: FaceId[]
   if (mission.id === "visible-faces") {
     const hiddenSelected = selectedFaces.filter((faceId) => !cubeFaces[faceId].visibleInDefaultView);
     if (hiddenSelected.length > 0) {
-      return `${wrongHeader}${hiddenSelected.map((faceId) => cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이지 않는 면이에요. 보이는 두 옆면과 윗면을 다시 찾아보세요.`;
+      return `${wrongHeader}${hiddenSelected.map((faceId) => cubeFaces[faceId].displayName ?? cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이지 않는 면이에요. 보이는 두 옆면과 윗면을 다시 찾아보세요.`;
     }
   }
 
   if (mission.id === "hidden-faces" || mission.id === "hidden-edge-related") {
     const visibleSelected = selectedFaces.filter((faceId) => cubeFaces[faceId].visibleInDefaultView);
     if (visibleSelected.length > 0) {
-      return `${wrongHeader}${visibleSelected.map((faceId) => cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이는 면이에요. 보이지 않는 면을 찾아야 해요.`;
+      return `${wrongHeader}${visibleSelected.map((faceId) => cubeFaces[faceId].displayName ?? cubeFaces[faceId].label).join(", ")}은 기본 겨냥도에서 보이는 면이에요. 보이지 않는 면을 찾아야 해요.`;
     }
   }
 
@@ -79,7 +79,7 @@ export function getMissionFeedback(missionIndex: number, selectedFaces: FaceId[]
   }
 
   if (extra.length > 0) {
-    return `${wrongHeader}${extra.map((faceId) => cubeFaces[faceId].label).join(", ")}은 이번 문제의 정답에 포함되지 않아요. 면의 관계를 다시 확인해 보세요.`;
+    return `${wrongHeader}${extra.map((faceId) => cubeFaces[faceId].displayName ?? cubeFaces[faceId].label).join(", ")}은 이번 문제의 정답에 포함되지 않아요. 면의 관계를 다시 확인해 보세요.`;
   }
 
   if (missing.length > 0) {
