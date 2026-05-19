@@ -5,6 +5,7 @@ import {
   adjacentFaceColor,
   baseFaceColor,
   cubeFaces,
+  getFaceLabel,
   oppositeFaceColor,
   selectedFaceColor,
 } from "@/data/cube";
@@ -58,7 +59,7 @@ export function CubeFace({ faceId, position, rotation, selectedFace, selectedFac
   const isAdjacent = selectedRelation?.adjacent.includes(faceId) ?? false;
   const faceColor = isSelected && isMissionMode ? "#ff3b30" : isOpposite ? oppositeFaceColor : isSelected ? selectedFaceColor : isAdjacent ? adjacentFaceColor : baseFaceColor;
   const edgeColor = "#000000";
-  const labelText = cubeFaces[faceId].displayName ?? cubeFaces[faceId].label;
+  const labelText = getFaceLabel(faceId);
   const labelTexture = useMemo(() => createLabelTexture(labelText), [labelText]);
 
   return (
