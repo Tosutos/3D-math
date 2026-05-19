@@ -79,8 +79,8 @@ export function CubeFace({ faceId, position, rotation, selectedFace, selectedFac
           roughness={0.42}
           metalness={0.05}
           side={DoubleSide}
-          transparent
-          opacity={transparentMode ? (isSelected || isOpposite ? 0.72 : 0.34) : isSelected || isOpposite ? 1 : 0.82}
+          transparent={transparentMode}
+          opacity={transparentMode ? (isSelected || isOpposite ? 0.72 : 0.34) : 1}
           depthWrite={!transparentMode}
         />
         {(showEdges ?? !transparentMode) && <Edges color={edgeColor} linewidth={2} />}
@@ -95,7 +95,7 @@ export function CubeFace({ faceId, position, rotation, selectedFace, selectedFac
             }}
           >
             <planeGeometry args={[0.68, 0.68]} />
-            <meshBasicMaterial map={labelTexture} transparent opacity={transparentMode ? 0.72 : 0.95} depthWrite={false} side={DoubleSide} />
+            <meshBasicMaterial map={labelTexture} transparent={transparentMode} opacity={transparentMode ? 0.72 : 1} depthWrite={!transparentMode} side={DoubleSide} />
           </mesh>
           <mesh
             position={[0, 0, -0.032]}
@@ -106,7 +106,7 @@ export function CubeFace({ faceId, position, rotation, selectedFace, selectedFac
             }}
           >
             <planeGeometry args={[0.68, 0.68]} />
-            <meshBasicMaterial map={labelTexture} transparent opacity={transparentMode ? 0.72 : 0.95} depthWrite={false} side={DoubleSide} />
+            <meshBasicMaterial map={labelTexture} transparent={transparentMode} opacity={transparentMode ? 0.72 : 1} depthWrite={!transparentMode} side={DoubleSide} />
           </mesh>
         </>
       )}
