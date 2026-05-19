@@ -11,7 +11,7 @@ export const missions: Mission[] = [
   {
     id: "opposite-front",
     title: "미션 2. 마주 보는 면 찾기",
-    prompt: "면 '가'와 평행한 면을 전개도에서 선택하세요.",
+    prompt: "면 '라'와 평행한 면을 전개도에서 선택하세요.",
     answer: ["back"],
     allowMultiple: true,
   },
@@ -25,7 +25,7 @@ export const missions: Mission[] = [
   {
     id: "top-adjacent",
     title: "미션 4. 접었을 때 만나는 면 찾기",
-    prompt: "전개도를 접었을 때 면 '바'와 만나는 면을 모두 고르세요.",
+    prompt: "전개도를 접었을 때 면 '가'와 만나는 면을 모두 고르세요.",
     answer: ["front", "back", "left", "right"],
     allowMultiple: true,
   },
