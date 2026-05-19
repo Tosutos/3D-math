@@ -1,8 +1,10 @@
 import type { ThreeEvent } from "@react-three/fiber";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { UnfoldEdgeId } from "@/types/geometry";
 
 type UnfoldHandleProps = {
   progress: number;
+  activeEdge: UnfoldEdgeId;
   onChangeProgress: (progress: number) => void;
   onDragActiveChange: (active: boolean) => void;
 };
@@ -10,17 +12,25 @@ type UnfoldHandleProps = {
 const handleLength = 1.48;
 const halfHandleLength = handleLength / 2;
 
+const handleTransforms: Record<UnfoldEdgeId, { position: [number, number, number]; rotation: [number, number, number] }> = {
+  "bottom-front": { position: [0, -0.34, 1.58], rotation: [0, 0, 0] },
+  "bottom-back": { position: [0, -0.34, -1.58], rotation: [0, Math.PI, 0] },
+  "bottom-right": { position: [1.58, -0.34, 0], rotation: [0, Math.PI / 2, 0] },
+  "bottom-left": { position: [-1.58, -0.34, 0], rotation: [0, -Math.PI / 2, 0] },
+};
+
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
 }
 
-export function UnfoldHandle({ progress, onChangeProgress, onDragActiveChange }: UnfoldHandleProps) {
+export function UnfoldHandle({ progress, activeEdge, onChangeProgress, onDragActiveChange }: UnfoldHandleProps) {
   const [dragging, setDragging] = useState(false);
   const progressRef = useRef(progress);
   const pendingProgressRef = useRef(progress);
   const startProgressRef = useRef(progress);
   const startClientXRef = useRef(0);
   const rafRef = useRef<number | null>(null);
+  const transform = handleTransforms[activeEdge];
 
   const stopDrag = useCallback(() => {
     setDragging(false);
@@ -81,7 +91,7 @@ export function UnfoldHandle({ progress, onChangeProgress, onDragActiveChange }:
   };
 
   return (
-    <group position={[0, -0.34, 1.58]}>
+    <group position={transform.position} rotation={transform.rotation}>
       <mesh position={[0, 0, -0.012]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.026, 0.026, handleLength + 0.18, 20]} />
         <meshStandardMaterial color="#dbeafe" transparent opacity={0.58} roughness={0.2} />

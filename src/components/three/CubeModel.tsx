@@ -1,6 +1,6 @@
 import { CubeFace } from "@/components/three/CubeFace";
 import { DynamicCubeEdges } from "@/components/three/DynamicCubeEdges";
-import type { FaceId, GeometryViewMode } from "@/types/geometry";
+import type { FaceId, GeometryViewMode, UnfoldEdgeId } from "@/types/geometry";
 
 type CubeModelProps = {
   selectedFace: FaceId | null;
@@ -8,6 +8,7 @@ type CubeModelProps = {
   viewMode: GeometryViewMode;
   transparentMode: boolean;
   unfoldProgress: number;
+  activeUnfoldEdge: UnfoldEdgeId;
 };
 
 type FaceTransform = {
@@ -43,7 +44,7 @@ function smoothstep(value: number) {
   return t * t * (3 - 2 * t);
 }
 
-function Face({ faceId, selectedFace, transparentMode, onSelectFace }: Omit<CubeModelProps, "viewMode" | "unfoldProgress"> & { faceId: FaceId }) {
+function Face({ faceId, selectedFace, transparentMode, onSelectFace }: Omit<CubeModelProps, "viewMode" | "unfoldProgress" | "activeUnfoldEdge"> & { faceId: FaceId }) {
   return (
     <CubeFace
       faceId={faceId}
@@ -56,9 +57,87 @@ function Face({ faceId, selectedFace, transparentMode, onSelectFace }: Omit<Cube
   );
 }
 
-function FloorUnfoldCube({ selectedFace, transparentMode, onSelectFace, unfoldProgress }: Omit<CubeModelProps, "viewMode">) {
-  const t = smoothstep(unfoldProgress);
-  const sideAngle = (Math.PI / 2) * t;
+type SideConfig = {
+  edge: UnfoldEdgeId;
+  faceId: FaceId;
+  hingePosition: [number, number, number];
+  hingeRotation: [number, number, number];
+  faceRotation: [number, number, number];
+  topRotation: [number, number, number];
+};
+
+function SideWithOptionalTop({
+  config,
+  sideAngle,
+  activeUnfoldEdge,
+  selectedFace,
+  transparentMode,
+  onSelectFace,
+}: {
+  config: SideConfig;
+  sideAngle: number;
+  activeUnfoldEdge: UnfoldEdgeId;
+  selectedFace: FaceId | null;
+  transparentMode: boolean;
+  onSelectFace: (face: FaceId) => void;
+}) {
+  const hingeRotation = config.hingeRotation.map((value) => value * sideAngle) as [number, number, number];
+  const topHingeRotation = config.hingeRotation.map((value) => value * sideAngle) as [number, number, number];
+  const topAttached = config.edge === activeUnfoldEdge;
+
+  return (
+    <group position={config.hingePosition} rotation={hingeRotation}>
+      <group position={[0, 1, 0]} rotation={config.faceRotation}>
+        <Face faceId={config.faceId} selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+      </group>
+      {topAttached && (
+        <group position={[0, 2, 0]} rotation={topHingeRotation}>
+          <group position={[0, 0, -1]} rotation={config.topRotation}>
+            <Face faceId="top" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+          </group>
+        </group>
+      )}
+    </group>
+  );
+}
+
+const sideConfigs: SideConfig[] = [
+  {
+    edge: "bottom-front",
+    faceId: "front",
+    hingePosition: [0, -1, 1],
+    hingeRotation: [1, 0, 0],
+    faceRotation: [0, 0, 0],
+    topRotation: [-Math.PI / 2, 0, 0],
+  },
+  {
+    edge: "bottom-back",
+    faceId: "back",
+    hingePosition: [0, -1, -1],
+    hingeRotation: [-1, 0, 0],
+    faceRotation: [0, Math.PI, 0],
+    topRotation: [Math.PI / 2, Math.PI, 0],
+  },
+  {
+    edge: "bottom-right",
+    faceId: "right",
+    hingePosition: [1, -1, 0],
+    hingeRotation: [0, 0, -1],
+    faceRotation: [0, Math.PI / 2, 0],
+    topRotation: [-Math.PI / 2, 0, -Math.PI / 2],
+  },
+  {
+    edge: "bottom-left",
+    faceId: "left",
+    hingePosition: [-1, -1, 0],
+    hingeRotation: [0, 0, 1],
+    faceRotation: [0, -Math.PI / 2, 0],
+    topRotation: [-Math.PI / 2, 0, Math.PI / 2],
+  },
+];
+
+function FloorUnfoldCube({ selectedFace, transparentMode, onSelectFace, unfoldProgress, activeUnfoldEdge }: Omit<CubeModelProps, "viewMode">) {
+  const sideAngle = (Math.PI / 2) * smoothstep(unfoldProgress);
 
   return (
     <group>
@@ -66,39 +145,22 @@ function FloorUnfoldCube({ selectedFace, transparentMode, onSelectFace, unfoldPr
         <Face faceId="bottom" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
       </group>
 
-      <group position={[0, -1, 1]} rotation={[sideAngle, 0, 0]}>
-        <group position={[0, 1, 0]}>
-          <Face faceId="front" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
-        </group>
-        <group position={[0, 2, 0]} rotation={[sideAngle, 0, 0]}>
-          <group position={[0, 0, -1]} rotation={[-Math.PI / 2, 0, 0]}>
-            <Face faceId="top" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
-          </group>
-        </group>
-      </group>
-
-      <group position={[0, -1, -1]} rotation={[-sideAngle, 0, 0]}>
-        <group position={[0, 1, 0]} rotation={[0, Math.PI, 0]}>
-          <Face faceId="back" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
-        </group>
-      </group>
-
-      <group position={[1, -1, 0]} rotation={[0, 0, -sideAngle]}>
-        <group position={[0, 1, 0]} rotation={[0, Math.PI / 2, 0]}>
-          <Face faceId="right" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
-        </group>
-      </group>
-
-      <group position={[-1, -1, 0]} rotation={[0, 0, sideAngle]}>
-        <group position={[0, 1, 0]} rotation={[0, -Math.PI / 2, 0]}>
-          <Face faceId="left" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
-        </group>
-      </group>
+      {sideConfigs.map((config) => (
+        <SideWithOptionalTop
+          key={config.edge}
+          config={config}
+          sideAngle={sideAngle}
+          activeUnfoldEdge={activeUnfoldEdge}
+          selectedFace={selectedFace}
+          transparentMode={transparentMode}
+          onSelectFace={onSelectFace}
+        />
+      ))}
     </group>
   );
 }
 
-export function CubeModel({ selectedFace, onSelectFace, viewMode, transparentMode, unfoldProgress }: CubeModelProps) {
+export function CubeModel({ selectedFace, onSelectFace, viewMode, transparentMode, unfoldProgress, activeUnfoldEdge }: CubeModelProps) {
   const isNet = viewMode === "net";
   const isUnfold = viewMode === "unfold";
   const transforms = isNet ? netFaceTransforms : foldedFaceTransforms;
@@ -108,7 +170,13 @@ export function CubeModel({ selectedFace, onSelectFace, viewMode, transparentMod
   return (
     <group position={position} scale={scale}>
       {isUnfold ? (
-        <FloorUnfoldCube selectedFace={selectedFace} onSelectFace={onSelectFace} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
+        <FloorUnfoldCube
+          selectedFace={selectedFace}
+          onSelectFace={onSelectFace}
+          transparentMode={transparentMode}
+          unfoldProgress={unfoldProgress}
+          activeUnfoldEdge={activeUnfoldEdge}
+        />
       ) : (
         <>
           {!isNet && <DynamicCubeEdges visible={transparentMode} />}
