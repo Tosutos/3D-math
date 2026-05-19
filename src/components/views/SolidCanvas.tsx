@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { ContactShadows, Grid, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -25,7 +25,7 @@ function mixVector(a: [number, number, number], b: [number, number, number], t: 
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 }
 
-function CameraRig({ viewMode, unfoldProgress }: { viewMode: GeometryViewMode; unfoldProgress: number }) {
+function CameraRig({ viewMode, unfoldProgress, controlsEnabled }: { viewMode: GeometryViewMode; unfoldProgress: number; controlsEnabled: boolean }) {
   const { camera } = useThree();
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
@@ -47,7 +47,7 @@ function CameraRig({ viewMode, unfoldProgress }: { viewMode: GeometryViewMode; u
     controlsRef.current?.update();
   }, [camera, viewMode, unfoldProgress]);
 
-  return <OrbitControls ref={controlsRef} enablePan enableZoom minDistance={3.2} maxDistance={10} makeDefault />;
+  return <OrbitControls ref={controlsRef} enabled={controlsEnabled} enablePan enableZoom minDistance={3.2} maxDistance={10} makeDefault />;
 }
 
 function Floor() {
@@ -75,6 +75,8 @@ function Floor() {
 }
 
 export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldProgress, onSelectFace, onChangeUnfoldProgress }: SolidCanvasProps) {
+  const [handleDragging, setHandleDragging] = useState(false);
+
   return (
     <Canvas shadows camera={{ position: [4.4, 3.4, 5.4], fov: 38 }}>
       <color attach="background" args={["#eaf8ff"]} />
@@ -84,10 +86,10 @@ export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldPro
       <pointLight position={[-4, 2, -4]} intensity={1.1} color="#7dd3fc" />
       <pointLight position={[4, -1, 3]} intensity={0.65} color="#bae6fd" />
       <CubeModel selectedFace={selectedFace} onSelectFace={onSelectFace} viewMode={viewMode} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
-      {viewMode === "unfold" && <UnfoldHandle progress={unfoldProgress} onChangeProgress={onChangeUnfoldProgress} />}
+      {viewMode === "unfold" && <UnfoldHandle progress={unfoldProgress} onChangeProgress={onChangeUnfoldProgress} onDragActiveChange={setHandleDragging} />}
       <Floor />
       <ContactShadows position={[0, -1.23, 0]} opacity={0.42} scale={9} blur={2.8} />
-      <CameraRig viewMode={viewMode} unfoldProgress={unfoldProgress} />
+      <CameraRig viewMode={viewMode} unfoldProgress={unfoldProgress} controlsEnabled={!handleDragging} />
     </Canvas>
   );
 }

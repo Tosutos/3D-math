@@ -43,70 +43,88 @@ function smoothstep(value: number) {
   return t * t * (3 - 2 * t);
 }
 
-function getFloorUnfoldTransforms(progress: number): FaceTransform[] {
-  const t = smoothstep(progress);
-  const sideAngle = (Math.PI / 2) * (1 - t);
-  const topAngle = Math.PI * (1 - t);
-  const floorY = -1;
+function Face({ faceId, selectedFace, transparentMode, onSelectFace }: Omit<CubeModelProps, "viewMode" | "unfoldProgress"> & { faceId: FaceId }) {
+  return (
+    <CubeFace
+      faceId={faceId}
+      position={[0, 0, 0]}
+      rotation={[0, 0, 0]}
+      selectedFace={selectedFace}
+      transparentMode={transparentMode}
+      onSelectFace={onSelectFace}
+    />
+  );
+}
 
-  const frontOuterEdgeY = floorY + 2 * Math.sin(sideAngle);
-  const frontOuterEdgeZ = 1 + 2 * Math.cos(sideAngle);
+function FloorUnfoldCube({ selectedFace, transparentMode, onSelectFace, unfoldProgress }: Omit<CubeModelProps, "viewMode">) {
+  const t = smoothstep(unfoldProgress);
+  const sideAngle = (Math.PI / 2) * t;
 
-  return [
-    {
-      faceId: "bottom",
-      position: [0, floorY, 0],
-      rotation: [Math.PI / 2, 0, 0],
-    },
-    {
-      faceId: "front",
-      position: [0, floorY + Math.sin(sideAngle), 1 + Math.cos(sideAngle)],
-      rotation: [sideAngle - Math.PI / 2, 0, 0],
-    },
-    {
-      faceId: "back",
-      position: [0, floorY + Math.sin(sideAngle), -1 - Math.cos(sideAngle)],
-      rotation: [Math.PI / 2 - sideAngle, Math.PI, 0],
-    },
-    {
-      faceId: "right",
-      position: [1 + Math.cos(sideAngle), floorY + Math.sin(sideAngle), 0],
-      rotation: [Math.PI / 2, 0, Math.PI / 2 - sideAngle],
-    },
-    {
-      faceId: "left",
-      position: [-1 - Math.cos(sideAngle), floorY + Math.sin(sideAngle), 0],
-      rotation: [Math.PI / 2, 0, sideAngle - Math.PI / 2],
-    },
-    {
-      faceId: "top",
-      position: [0, frontOuterEdgeY + Math.sin(topAngle), frontOuterEdgeZ + Math.cos(topAngle)],
-      rotation: [Math.PI / 2 - topAngle, 0, 0],
-    },
-  ];
+  return (
+    <group>
+      <group position={[0, -1, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <Face faceId="bottom" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+      </group>
+
+      <group position={[0, -1, 1]} rotation={[sideAngle, 0, 0]}>
+        <group position={[0, 1, 0]}>
+          <Face faceId="front" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+        </group>
+        <group position={[0, 2, 0]} rotation={[sideAngle, 0, 0]}>
+          <group position={[0, 0, -1]} rotation={[-Math.PI / 2, 0, 0]}>
+            <Face faceId="top" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+          </group>
+        </group>
+      </group>
+
+      <group position={[0, -1, -1]} rotation={[-sideAngle, 0, 0]}>
+        <group position={[0, 1, 0]} rotation={[0, Math.PI, 0]}>
+          <Face faceId="back" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+        </group>
+      </group>
+
+      <group position={[1, -1, 0]} rotation={[0, 0, -sideAngle]}>
+        <group position={[0, 1, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <Face faceId="right" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+        </group>
+      </group>
+
+      <group position={[-1, -1, 0]} rotation={[0, 0, sideAngle]}>
+        <group position={[0, 1, 0]} rotation={[0, -Math.PI / 2, 0]}>
+          <Face faceId="left" selectedFace={selectedFace} transparentMode={transparentMode} onSelectFace={onSelectFace} />
+        </group>
+      </group>
+    </group>
+  );
 }
 
 export function CubeModel({ selectedFace, onSelectFace, viewMode, transparentMode, unfoldProgress }: CubeModelProps) {
   const isNet = viewMode === "net";
   const isUnfold = viewMode === "unfold";
-  const transforms = isNet ? netFaceTransforms : isUnfold ? getFloorUnfoldTransforms(unfoldProgress) : foldedFaceTransforms;
-  const position: [number, number, number] = isNet ? [-1.05, 0, 0.35] : isUnfold ? [0, -0.28, 0] : [0, -0.28, 0];
+  const transforms = isNet ? netFaceTransforms : foldedFaceTransforms;
+  const position: [number, number, number] = isNet ? [-1.05, 0, 0.35] : [0, -0.28, 0];
   const scale = isNet ? 0.86 : isUnfold ? 0.82 : 1;
 
   return (
     <group position={position} scale={scale}>
-      {!isNet && !isUnfold && <DynamicCubeEdges visible={transparentMode} />}
-      {transforms.map((face) => (
-        <CubeFace
-          key={face.faceId}
-          faceId={face.faceId}
-          position={face.position}
-          rotation={face.rotation}
-          selectedFace={selectedFace}
-          transparentMode={transparentMode}
-          onSelectFace={onSelectFace}
-        />
-      ))}
+      {isUnfold ? (
+        <FloorUnfoldCube selectedFace={selectedFace} onSelectFace={onSelectFace} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
+      ) : (
+        <>
+          {!isNet && <DynamicCubeEdges visible={transparentMode} />}
+          {transforms.map((face) => (
+            <CubeFace
+              key={face.faceId}
+              faceId={face.faceId}
+              position={face.position}
+              rotation={face.rotation}
+              selectedFace={selectedFace}
+              transparentMode={transparentMode}
+              onSelectFace={onSelectFace}
+            />
+          ))}
+        </>
+      )}
     </group>
   );
 }
