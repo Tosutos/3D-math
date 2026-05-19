@@ -57,7 +57,14 @@ export function ModelingWorkspace() {
   return (
     <main className="relative h-screen min-h-[720px] overflow-hidden bg-sky-100 text-white">
       <div className="absolute inset-0">
-        <SolidCanvas selectedFace={selectedFace} viewMode={viewMode} transparentMode={transparentMode} unfoldProgress={unfoldProgress} onSelectFace={handleSelectFace} />
+        <SolidCanvas
+          selectedFace={selectedFace}
+          viewMode={viewMode}
+          transparentMode={transparentMode}
+          unfoldProgress={unfoldProgress}
+          onSelectFace={handleSelectFace}
+          onChangeUnfoldProgress={setUnfoldProgress}
+        />
       </div>
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0%,transparent_45%,rgba(125,211,252,0.24)_100%)]" />
@@ -66,10 +73,8 @@ export function ModelingWorkspace() {
         mode={mode}
         viewMode={viewMode}
         transparentMode={transparentMode}
-        unfoldProgress={unfoldProgress}
         onChangeMode={changeMode}
         onChangeViewMode={changeViewMode}
-        onChangeUnfoldProgress={setUnfoldProgress}
         onToggleTransparent={() => setTransparentMode((value) => !value)}
         onReset={resetSelection}
       />
@@ -88,7 +93,7 @@ export function ModelingWorkspace() {
       <div className="absolute left-1/2 top-4 z-10 hidden -translate-x-1/2 rounded-full border border-white/10 bg-slate-950/50 px-4 py-2 text-xs font-bold text-slate-300 backdrop-blur md:block">
         {viewMode === "solid" && "입체 보기 · 드래그: 회전 · 면 클릭: 선택"}
         {viewMode === "isometric" && "겨냥도 보기 · 같은 3D 도형을 정해진 시점에서 관찰"}
-        {viewMode === "unfold" && "펼치기 보기 · 전개 손잡이를 드래그하면 입체가 점점 펴져요"}
+        {viewMode === "unfold" && "펼치기 보기 · 파란 핸들바를 끌면 아랫면을 기준으로 바닥에 펼쳐져요"}
         {viewMode === "net" && "전개 보기 · 위/아래는 기준을 어떻게 잡는지에 따라 바뀔 수 있어요"}
       </div>
     </main>

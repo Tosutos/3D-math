@@ -5,6 +5,7 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { ContactShadows, Grid, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { CubeModel } from "@/components/three/CubeModel";
+import { UnfoldHandle } from "@/components/three/UnfoldHandle";
 import type { FaceId, GeometryViewMode } from "@/types/geometry";
 
 type SolidCanvasProps = {
@@ -13,6 +14,7 @@ type SolidCanvasProps = {
   transparentMode: boolean;
   unfoldProgress: number;
   onSelectFace: (face: FaceId) => void;
+  onChangeUnfoldProgress: (progress: number) => void;
 };
 
 function lerp(a: number, b: number, t: number) {
@@ -30,8 +32,8 @@ function CameraRig({ viewMode, unfoldProgress }: { viewMode: GeometryViewMode; u
   useEffect(() => {
     const foldedTarget: [number, number, number] = [0, -0.28, 0];
     const foldedPosition: [number, number, number] = [4.4, 2.8, 5.4];
-    const unfoldTarget: [number, number, number] = [0.35, -0.25, 0.9];
-    const unfoldPosition: [number, number, number] = [0.35, -0.2, 8.4];
+    const unfoldTarget: [number, number, number] = [0, -0.85, 0.95];
+    const unfoldPosition: [number, number, number] = [0, 3.8, 7.4];
     const netTarget: [number, number, number] = [0.6, -1.18, 0.2];
     const netPosition: [number, number, number] = [0.6, 5.9, 5.2];
     const progress = viewMode === "unfold" ? unfoldProgress : 0;
@@ -72,7 +74,7 @@ function Floor() {
   );
 }
 
-export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldProgress, onSelectFace }: SolidCanvasProps) {
+export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldProgress, onSelectFace, onChangeUnfoldProgress }: SolidCanvasProps) {
   return (
     <Canvas shadows camera={{ position: [4.4, 3.4, 5.4], fov: 38 }}>
       <color attach="background" args={["#eaf8ff"]} />
@@ -82,6 +84,7 @@ export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldPro
       <pointLight position={[-4, 2, -4]} intensity={1.1} color="#7dd3fc" />
       <pointLight position={[4, -1, 3]} intensity={0.65} color="#bae6fd" />
       <CubeModel selectedFace={selectedFace} onSelectFace={onSelectFace} viewMode={viewMode} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
+      {viewMode === "unfold" && <UnfoldHandle progress={unfoldProgress} onChangeProgress={onChangeUnfoldProgress} />}
       <Floor />
       <ContactShadows position={[0, -1.23, 0]} opacity={0.42} scale={9} blur={2.8} />
       <CameraRig viewMode={viewMode} unfoldProgress={unfoldProgress} />

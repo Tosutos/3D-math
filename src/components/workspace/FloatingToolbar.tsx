@@ -4,10 +4,8 @@ type FloatingToolbarProps = {
   mode: LearningMode;
   viewMode: GeometryViewMode;
   transparentMode: boolean;
-  unfoldProgress: number;
   onChangeMode: (mode: LearningMode) => void;
   onChangeViewMode: (viewMode: GeometryViewMode) => void;
-  onChangeUnfoldProgress: (progress: number) => void;
   onToggleTransparent: () => void;
   onReset: () => void;
 };
@@ -18,10 +16,8 @@ export function FloatingToolbar({
   mode,
   viewMode,
   transparentMode,
-  unfoldProgress,
   onChangeMode,
   onChangeViewMode,
-  onChangeUnfoldProgress,
   onToggleTransparent,
   onReset,
 }: FloatingToolbarProps) {
@@ -56,29 +52,14 @@ export function FloatingToolbar({
             </button>
           ))}
         </div>
-        <p className="mt-2 text-[11px] leading-4 text-slate-400">펼치기에서는 바를 끌어 입체가 전개도로 변하는 과정을 관찰합니다.</p>
+        <p className="mt-2 text-[11px] leading-4 text-slate-400">
+          펼치기에서는 장면 안의 아랫면 모서리 핸들바를 끌어 종이 주사위처럼 바닥으로 펼칩니다.
+        </p>
       </div>
 
       {viewMode === "unfold" && (
-        <div className="mt-3 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 p-3">
-          <div className="mb-2 flex items-center justify-between gap-3">
-            <p className="text-xs font-bold text-cyan-100">전개 손잡이</p>
-            <span className="rounded-full bg-cyan-200 px-2 py-0.5 text-[10px] font-black text-slate-950">{Math.round(unfoldProgress * 100)}%</span>
-          </div>
-          <input
-            aria-label="정육면체 전개 진행도"
-            type="range"
-            min="0"
-            max="100"
-            value={Math.round(unfoldProgress * 100)}
-            onChange={(event) => onChangeUnfoldProgress(Number(event.target.value) / 100)}
-            className="h-2 w-full accent-cyan-300"
-          />
-          <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400">
-            <span>입체</span>
-            <span>전개도</span>
-          </div>
-          <p className="mt-2 text-[11px] leading-4 text-cyan-100/80">front 면을 기준으로 모서리를 축 삼아 종이 주사위처럼 접힌 면들이 펴집니다.</p>
+        <div className="mt-3 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 p-3 text-[11px] font-bold leading-4 text-cyan-100/85">
+          3D 화면의 파란 핸들바를 드래그해 보세요. 아랫면은 바닥에 남고 나머지 면이 밖으로 펴집니다.
         </div>
       )}
 
