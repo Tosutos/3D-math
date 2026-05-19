@@ -1,5 +1,5 @@
 import type { ThreeEvent } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type UnfoldHandleProps = {
   progress: number;
@@ -17,10 +17,43 @@ function clamp01(value: number) {
 export function UnfoldHandle({ progress, onChangeProgress, onDragActiveChange }: UnfoldHandleProps) {
   const [dragging, setDragging] = useState(false);
   const progressRef = useRef(progress);
+  const pendingProgressRef = useRef(progress);
+  const rafRef = useRef<number | null>(null);
+
+  const stopDrag = useCallback(() => {
+    setDragging(false);
+    onDragActiveChange(false);
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, [onDragActiveChange]);
 
   useEffect(() => {
     progressRef.current = progress;
+    pendingProgressRef.current = progress;
   }, [progress]);
+
+  useEffect(() => {
+    if (!dragging) return;
+    window.addEventListener("pointerup", stopDrag);
+    window.addEventListener("pointercancel", stopDrag);
+    window.addEventListener("blur", stopDrag);
+
+    return () => {
+      window.removeEventListener("pointerup", stopDrag);
+      window.removeEventListener("pointercancel", stopDrag);
+      window.removeEventListener("blur", stopDrag);
+    };
+  }, [dragging, stopDrag]);
+
+  const flushProgress = () => {
+    rafRef.current = null;
+    const next = pendingProgressRef.current;
+    if (Math.abs(next - progressRef.current) < 0.002) return;
+    progressRef.current = next;
+    onChangeProgress(next);
+  };
 
   const startDrag = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -31,13 +64,13 @@ export function UnfoldHandle({ progress, onChangeProgress, onDragActiveChange }:
   const drag = (event: ThreeEvent<PointerEvent>) => {
     if (!dragging) return;
     event.stopPropagation();
-    onChangeProgress(clamp01(progressRef.current + event.nativeEvent.movementX / 320));
+    pendingProgressRef.current = clamp01(pendingProgressRef.current + event.nativeEvent.movementX / 360);
+    if (rafRef.current === null) rafRef.current = requestAnimationFrame(flushProgress);
   };
 
   const endDrag = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
-    setDragging(false);
-    onDragActiveChange(false);
+    stopDrag();
   };
 
   return (

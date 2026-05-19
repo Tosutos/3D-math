@@ -76,9 +76,17 @@ function Floor() {
 
 export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldProgress, onSelectFace, onChangeUnfoldProgress }: SolidCanvasProps) {
   const [handleDragging, setHandleDragging] = useState(false);
+  const [handleCancelToken, setHandleCancelToken] = useState(0);
 
   return (
-    <Canvas shadows camera={{ position: [4.4, 3.4, 5.4], fov: 38 }}>
+    <Canvas
+      shadows
+      camera={{ position: [4.4, 3.4, 5.4], fov: 38 }}
+      onPointerMissed={() => {
+        setHandleDragging(false);
+        setHandleCancelToken((token) => token + 1);
+      }}
+    >
       <color attach="background" args={["#eaf8ff"]} />
       <fog attach="fog" args={["#eaf8ff", 18, 35]} />
       <ambientLight intensity={0.85} />
@@ -86,7 +94,14 @@ export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldPro
       <pointLight position={[-4, 2, -4]} intensity={1.1} color="#7dd3fc" />
       <pointLight position={[4, -1, 3]} intensity={0.65} color="#bae6fd" />
       <CubeModel selectedFace={selectedFace} onSelectFace={onSelectFace} viewMode={viewMode} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
-      {viewMode === "unfold" && <UnfoldHandle progress={unfoldProgress} onChangeProgress={onChangeUnfoldProgress} onDragActiveChange={setHandleDragging} />}
+      {viewMode === "unfold" && (
+        <UnfoldHandle
+          key={handleCancelToken}
+          progress={unfoldProgress}
+          onChangeProgress={onChangeUnfoldProgress}
+          onDragActiveChange={setHandleDragging}
+        />
+      )}
       <Floor />
       <ContactShadows position={[0, -1.23, 0]} opacity={0.42} scale={9} blur={2.8} />
       <CameraRig viewMode={viewMode} unfoldProgress={unfoldProgress} controlsEnabled={!handleDragging} />
