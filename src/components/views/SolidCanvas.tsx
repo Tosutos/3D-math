@@ -5,19 +5,16 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { ContactShadows, Grid, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { CubeModel } from "@/components/three/CubeModel";
-import { UnfoldEdgeSelector } from "@/components/three/UnfoldEdgeSelector";
 import { UnfoldHandle } from "@/components/three/UnfoldHandle";
-import type { FaceId, GeometryViewMode, UnfoldEdgeId } from "@/types/geometry";
+import type { FaceId, GeometryViewMode } from "@/types/geometry";
 
 type SolidCanvasProps = {
   selectedFace: FaceId | null;
   viewMode: GeometryViewMode;
   transparentMode: boolean;
   unfoldProgress: number;
-  activeUnfoldEdge: UnfoldEdgeId;
   onSelectFace: (face: FaceId) => void;
   onChangeUnfoldProgress: (progress: number) => void;
-  onChangeUnfoldEdge: (edge: UnfoldEdgeId) => void;
 };
 
 function lerp(a: number, b: number, t: number) {
@@ -77,16 +74,7 @@ function Floor() {
   );
 }
 
-export function SolidCanvas({
-  selectedFace,
-  viewMode,
-  transparentMode,
-  unfoldProgress,
-  activeUnfoldEdge,
-  onSelectFace,
-  onChangeUnfoldProgress,
-  onChangeUnfoldEdge,
-}: SolidCanvasProps) {
+export function SolidCanvas({ selectedFace, viewMode, transparentMode, unfoldProgress, onSelectFace, onChangeUnfoldProgress }: SolidCanvasProps) {
   const [handleDragging, setHandleDragging] = useState(false);
   const [handleCancelToken, setHandleCancelToken] = useState(0);
 
@@ -105,25 +93,14 @@ export function SolidCanvas({
       <directionalLight position={[4, 8, 4]} intensity={2.8} castShadow />
       <pointLight position={[-4, 2, -4]} intensity={1.1} color="#7dd3fc" />
       <pointLight position={[4, -1, 3]} intensity={0.65} color="#bae6fd" />
-      <CubeModel
-        selectedFace={selectedFace}
-        onSelectFace={onSelectFace}
-        viewMode={viewMode}
-        transparentMode={transparentMode}
-        unfoldProgress={unfoldProgress}
-        activeUnfoldEdge={activeUnfoldEdge}
-      />
+      <CubeModel selectedFace={selectedFace} onSelectFace={onSelectFace} viewMode={viewMode} transparentMode={transparentMode} unfoldProgress={unfoldProgress} />
       {viewMode === "unfold" && (
-        <>
-          <UnfoldEdgeSelector activeEdge={activeUnfoldEdge} onSelectEdge={onChangeUnfoldEdge} />
-          <UnfoldHandle
-            key={`${handleCancelToken}-${activeUnfoldEdge}`}
-            progress={unfoldProgress}
-            activeEdge={activeUnfoldEdge}
-            onChangeProgress={onChangeUnfoldProgress}
-            onDragActiveChange={setHandleDragging}
-          />
-        </>
+        <UnfoldHandle
+          key={handleCancelToken}
+          progress={unfoldProgress}
+          onChangeProgress={onChangeUnfoldProgress}
+          onDragActiveChange={setHandleDragging}
+        />
       )}
       <Floor />
       <ContactShadows position={[0, -1.23, 0]} opacity={0.42} scale={9} blur={2.8} />

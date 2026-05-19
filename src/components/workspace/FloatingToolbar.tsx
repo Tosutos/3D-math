@@ -59,7 +59,7 @@ export function FloatingToolbar({
 
       {viewMode === "unfold" && (
         <div className="mt-3 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 p-3 text-[11px] font-bold leading-4 text-cyan-100/85">
-          바닥의 노란 모서리를 먼저 고른 뒤, 그 모서리 옆 파란 mesh 핸들바를 좌우로 드래그해 보세요.
+          3D 화면의 파란 mesh 핸들바를 좌우로 드래그해 보세요. 아랫면은 바닥에 남고 나머지 면이 종이처럼 접혀 펴집니다.
         </div>
       )}
 

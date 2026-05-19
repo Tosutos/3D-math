@@ -6,7 +6,7 @@ import { InspectorPanel } from "@/components/workspace/InspectorPanel";
 import { MissionBar } from "@/components/workspace/MissionBar";
 import { SolidCanvas } from "@/components/views/SolidCanvas";
 import { missions } from "@/data/missions";
-import type { FaceId, GeometryViewMode, LearningMode, UnfoldEdgeId } from "@/types/geometry";
+import type { FaceId, GeometryViewMode, LearningMode } from "@/types/geometry";
 
 export function ModelingWorkspace() {
   const [selectedFace, setSelectedFace] = useState<FaceId | null>(null);
@@ -14,7 +14,6 @@ export function ModelingWorkspace() {
   const [viewMode, setViewMode] = useState<GeometryViewMode>("solid");
   const [transparentMode, setTransparentMode] = useState(false);
   const [unfoldProgress, setUnfoldProgress] = useState(0);
-  const [activeUnfoldEdge, setActiveUnfoldEdge] = useState<UnfoldEdgeId>("bottom-front");
   const [activeMissionIndex, setActiveMissionIndex] = useState(0);
   const [missionSelections, setMissionSelections] = useState<FaceId[]>([]);
   const [missionResult, setMissionResult] = useState<"correct" | "wrong" | null>(null);
@@ -63,13 +62,8 @@ export function ModelingWorkspace() {
           viewMode={viewMode}
           transparentMode={transparentMode}
           unfoldProgress={unfoldProgress}
-          activeUnfoldEdge={activeUnfoldEdge}
           onSelectFace={handleSelectFace}
           onChangeUnfoldProgress={setUnfoldProgress}
-          onChangeUnfoldEdge={(edge) => {
-            setActiveUnfoldEdge(edge);
-            setUnfoldProgress(0);
-          }}
         />
       </div>
 
@@ -99,7 +93,7 @@ export function ModelingWorkspace() {
       <div className="absolute left-1/2 top-4 z-10 hidden -translate-x-1/2 rounded-full border border-white/10 bg-slate-950/50 px-4 py-2 text-xs font-bold text-slate-300 backdrop-blur md:block">
         {viewMode === "solid" && "입체 보기 · 드래그: 회전 · 면 클릭: 선택"}
         {viewMode === "isometric" && "겨냥도 보기 · 같은 3D 도형을 정해진 시점에서 관찰"}
-        {viewMode === "unfold" && "펼치기 보기 · 노란 모서리를 고르고 파란 핸들바를 끌어 펼쳐요"}
+        {viewMode === "unfold" && "펼치기 보기 · 파란 핸들바를 끌면 아랫면을 기준으로 바닥에 펼쳐져요"}
         {viewMode === "net" && "전개 보기 · 위/아래는 기준을 어떻게 잡는지에 따라 바뀔 수 있어요"}
       </div>
     </main>

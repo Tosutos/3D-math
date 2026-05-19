@@ -4,8 +4,6 @@ export type LearningMode = "explore" | "mission";
 
 export type GeometryViewMode = "solid" | "isometric" | "unfold" | "net";
 
-export type UnfoldEdgeId = "bottom-front" | "bottom-back" | "bottom-right" | "bottom-left";
-
 export type FaceRelation = {
   id: FaceId;
   label: string;
