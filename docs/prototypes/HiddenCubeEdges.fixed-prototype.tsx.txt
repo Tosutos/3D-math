@@ -1,0 +1,43 @@
+import { Line } from "@react-three/drei";
+
+type HiddenCubeEdgesProps = {
+  visible: boolean;
+};
+
+const hiddenEdges: Array<[[number, number, number], [number, number, number]]> = [
+  [
+    [-1, -1, -1],
+    [1, -1, -1],
+  ],
+  [
+    [-1, -1, -1],
+    [-1, 1, -1],
+  ],
+  [
+    [-1, -1, -1],
+    [-1, -1, 1],
+  ],
+];
+
+export function HiddenCubeEdges({ visible }: HiddenCubeEdgesProps) {
+  if (!visible) return null;
+
+  return (
+    <group>
+      {hiddenEdges.map(([start, end]) => (
+        <Line
+          key={`${start.join(",")}-${end.join(",")}`}
+          points={[start, end]}
+          color="#334155"
+          lineWidth={2.4}
+          dashed
+          dashSize={0.16}
+          gapSize={0.11}
+          transparent
+          opacity={0.95}
+          depthTest={false}
+        />
+      ))}
+    </group>
+  );
+}

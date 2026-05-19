@@ -1,0 +1,29 @@
+import { IsometricView } from "@/components/views/IsometricView";
+import { NetView } from "@/components/views/NetView";
+import type { FaceId } from "@/types/geometry";
+
+type MiniViewDockProps = {
+  activeMiniView: "isometric" | "net" | "both" | "none";
+  selectedFace: FaceId | null;
+  showHiddenEdges: boolean;
+  onSelectFace: (face: FaceId) => void;
+};
+
+export function MiniViewDock({ activeMiniView, selectedFace, showHiddenEdges, onSelectFace }: MiniViewDockProps) {
+  if (activeMiniView === "none") return null;
+
+  return (
+    <div className="absolute bottom-4 left-4 z-20 flex max-w-[calc(100vw-2rem)] gap-3 overflow-x-auto pr-2">
+      {(activeMiniView === "isometric" || activeMiniView === "both") && (
+        <div className="w-[320px] shrink-0 [&_article]:min-h-0 [&_article]:bg-white/90 [&_article]:p-4 [&_svg]:h-[190px]">
+          <IsometricView selectedFace={selectedFace} onSelectFace={onSelectFace} showHiddenEdges={showHiddenEdges} />
+        </div>
+      )}
+      {(activeMiniView === "net" || activeMiniView === "both") && (
+        <div className="w-[320px] shrink-0 [&_article]:min-h-0 [&_article]:bg-white/90 [&_article]:p-4">
+          <NetView selectedFace={selectedFace} onSelectFace={onSelectFace} />
+        </div>
+      )}
+    </div>
+  );
+}
